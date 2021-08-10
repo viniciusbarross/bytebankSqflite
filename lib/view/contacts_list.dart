@@ -2,6 +2,7 @@ import 'package:bytebank/components/itemcontact_widget.dart';
 import 'package:bytebank/database/dao/contact_dao.dart';
 import 'package:bytebank/model/contact.dart';
 import 'package:bytebank/view/contact_new.dart';
+import 'package:bytebank/view/transaction_form.dart';
 import 'package:flutter/material.dart';
 
 class ContactsList extends StatefulWidget {
@@ -17,23 +18,31 @@ class _ContactsListState extends State<ContactsList> {
       appBar: AppBar(
         title: Text('Contacts'),
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<List<Contact>>(
         initialData: [],
         future: _dao.findAll(),
         builder: (context, snapshot) {
+          List<Contact> contacts = [];
           switch (snapshot.connectionState) {
             case ConnectionState.none:
               break;
             case ConnectionState.active:
               break;
             case ConnectionState.done:
-              final List<Contact> contacts = snapshot.data as List<Contact>;
-
+              if (snapshot.data == null) {
+                break;
+              }
+              contacts = snapshot.data as List<Contact>;
               return ListView.builder(
                 itemBuilder: (context, index) {
-                  return ItemContactCard(
-                    contacts[index],
-                  );
+                  final Contact contact = contacts[index];
+                  return ItemContactCard(contact, onClick: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => TransactionForm(contact),
+                      ),
+                    );
+                  });
                 },
                 itemCount: contacts.length,
               );

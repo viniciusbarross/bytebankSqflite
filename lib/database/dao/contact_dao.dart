@@ -27,6 +27,7 @@ class ContactDAO {
     final List<Contact> contacts = [];
     for (Map<String, dynamic> map in result) {
       final Contact contact = Contact(
+        // 0,
         map[name],
         map[account_number],
       );

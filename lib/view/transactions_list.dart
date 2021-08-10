@@ -1,14 +1,13 @@
 import 'package:bytebank/components/centered_message.dart';
 import 'package:bytebank/http/webclient.dart';
+import 'package:bytebank/http/webclient/transaction_webclient.dart';
 
 import 'package:bytebank/model/transaction.dart';
 import 'package:flutter/material.dart';
 
-const host = 'http://192.168.15.3';
-
 class TransactionsList extends StatelessWidget {
   List<Transaction> transactions = [];
-
+  TransactionWebClient webclient = TransactionWebClient();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +15,7 @@ class TransactionsList extends StatelessWidget {
         title: Text('Transactions'),
       ),
       body: FutureBuilder<List<Transaction>>(
-          future: findAll(host + ':8080/transactions'),
+          future: webclient.findAll(hostApi + ':8080/transactions'),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.active:

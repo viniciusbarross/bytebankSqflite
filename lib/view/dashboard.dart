@@ -1,7 +1,9 @@
+import 'package:bytebank/model/saldo.dart';
 import 'package:bytebank/view/contacts_list.dart';
 import 'package:bytebank/view/transactions_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DashBoard extends StatelessWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -19,6 +21,11 @@ class DashBoard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset('assets/bytebank_logo.png'),
+          ),
+          Consumer<Saldo>(
+            builder: (context, value, child) {
+              return Text(value.valor.toString());
+            },
           ),
           Container(
             height: 120,

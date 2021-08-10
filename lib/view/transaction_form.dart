@@ -1,5 +1,9 @@
+import 'package:bytebank/components/transaction_auth_dialog.dart';
+import 'package:bytebank/http/webclient.dart';
+import 'package:bytebank/http/webclient/transaction_webclient.dart';
 import 'package:bytebank/model/contact.dart';
 import 'package:bytebank/model/transaction.dart';
+import 'package:bytebank/view/transactions_list.dart';
 import 'package:flutter/material.dart';
 
 class TransactionForm extends StatefulWidget {
@@ -13,7 +17,7 @@ class TransactionForm extends StatefulWidget {
 
 class _TransactionFormState extends State<TransactionForm> {
   final TextEditingController _valueController = TextEditingController();
-
+  TransactionWebClient webclient = TransactionWebClient();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +65,19 @@ class _TransactionFormState extends State<TransactionForm> {
                       final double value = double.parse(_valueController.text);
                       final transactionCreated =
                           Transaction(value, widget.contact);
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return TransactionAuthDialog();
+                          });
+                      // webclient
+                      //     .save(hostApi + ':8080/transactions',
+                      //         transactionCreated)
+                      //     .then((transaction) {
+                      //   if (transaction != null) {
+                      //     Navigator.pop(context);
+                      //   }
+                      //                    });
                     },
                   ),
                 ),
