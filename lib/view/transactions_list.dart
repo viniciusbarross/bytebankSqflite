@@ -1,7 +1,10 @@
+import 'package:bytebank/components/centered_message.dart';
 import 'package:bytebank/http/webclient.dart';
-import 'package:bytebank/model/contact.dart';
+
 import 'package:bytebank/model/transaction.dart';
 import 'package:flutter/material.dart';
+
+const host = 'http://192.168.15.3';
 
 class TransactionsList extends StatelessWidget {
   List<Transaction> transactions = [];
@@ -13,42 +16,55 @@ class TransactionsList extends StatelessWidget {
         title: Text('Transactions'),
       ),
       body: FutureBuilder<List<Transaction>>(
-          future: findAll('http://10.100.20.62:8080/transactions'),
+          future: findAll(host + ':8080/transactions'),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.active:
                 break;
               case ConnectionState.done:
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    final Transaction transaction = transactions[index];
-                    return Card(
-                      child: ListTile(
-                        leading: Icon(Icons.monetization_on),
-                        title: Text(
-                          transaction.value.toString(),
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
+                if (snapshot.hasData) {
+                  transactions = snapshot.data as List<Transaction>;
+                  if (transactions.isNotEmpty) {
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        final Transaction transaction = transactions[index];
+                        return Card(
+                          child: ListTile(
+                            leading: Icon(Icons.monetization_on),
+                            title: Text(
+                              transaction.value.toString(),
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              transaction.contact.accountNumber.toString(),
+                              style: TextStyle(
+                                fontSize: 16.0,
+                              ),
+                            ),
                           ),
-                        ),
-                        subtitle: Text(
-                          transaction.contact.accountNumber.toString(),
-                          style: TextStyle(
-                            fontSize: 16.0,
-                          ),
-                        ),
-                      ),
+                        );
+                      },
+                      itemCount: transactions.length,
                     );
-                  },
-                  itemCount: transactions.length,
+                  }
+                }
+                return CenteredMessage(
+                  'No transactions found',
+                  icon: Icons.warning,
                 );
+
               case ConnectionState.none:
                 break;
               case ConnectionState.waiting:
                 break;
             }
-            return Text('Unknown error');
+            return CenteredMessage(
+              'No transactions found',
+              icon: Icons.warning,
+            );
           }),
     );
   }

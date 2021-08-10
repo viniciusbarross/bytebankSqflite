@@ -1,5 +1,8 @@
 import 'package:bytebank/http/webclient.dart';
+import 'package:bytebank/model/contact.dart';
+import 'package:bytebank/model/transaction.dart';
 import 'package:bytebank/view/dashboard.dart';
+import 'package:bytebank/view/transactions_list.dart';
 import 'package:flutter/material.dart';
 
 void main() {

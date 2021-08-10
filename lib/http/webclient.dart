@@ -21,7 +21,7 @@ class LoggingInterceptor implements InterceptorContract {
 
 Future<List<Transaction>> findAll(String uri) async {
   Client client = InterceptedClient.build(interceptors: [LoggingInterceptor()]);
-  var response = await client.get(Uri.parse(uri));
+  var response = await client.get(Uri.parse(uri)).timeout(Duration(seconds: 5));
 
   final List<dynamic> decodejson = jsonDecode(response.body);
   final List<Transaction> transactions = [];
@@ -37,4 +37,35 @@ Future<List<Transaction>> findAll(String uri) async {
     transactions.add(transaction);
   }
   return transactions;
+}
+
+Future<Transaction> save(String uri, Transaction transaction) async {
+  final Map<String, dynamic> transactionMap = {
+    'value': transaction.value,
+    'contact': {
+      'name': transaction.contact.name,
+      'accountNumber': transaction.contact.accountNumber
+    }
+  };
+
+  final String transactionJson = jsonEncode(transactionMap);
+
+  Client client = InterceptedClient.build(interceptors: [LoggingInterceptor()]);
+  var response = await client
+      .post(
+        Uri.parse(uri),
+        headers: {'Content-type': 'application/json', 'password': '1000'},
+        body: transactionJson,
+      )
+      .timeout(Duration(seconds: 5));
+  Map<String, dynamic> json = jsonDecode(response.body);
+  final Map<String, dynamic> contactJson = json['contact'];
+  return Transaction(
+    json['value'],
+    Contact(
+      contactJson['name'],
+      contactJson['accountNumber'],
+    ),
+  );
+  ;
 }
