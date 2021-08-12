@@ -33,7 +33,8 @@ class TransactionWebClient {
     return transactions;
   }
 
-  Future<Transaction> save(String uri, Transaction transaction) async {
+  Future<Transaction> save(
+      String uri, Transaction transaction, String password) async {
     //Map<String, dynamic> transactionMap = _toMap(transaction);
 
     final String transactionJson = jsonEncode(transaction.toJson());
@@ -43,11 +44,24 @@ class TransactionWebClient {
     var response = await client
         .post(
           Uri.parse(uri),
-          headers: {'Content-type': 'application/json', 'password': '1000'},
+          headers: {
+            'Content-type': 'application/json',
+            'password': '$password'
+          },
           body: transactionJson,
         )
         .timeout(Duration(seconds: 5));
-    return _toTransaction(response);
+
+    if (response.statusCode == 400) {
+      throw Exception('there was an error submitting transaction');
+    }
+
+    if (response.statusCode == 401) {
+      throw Exception('authentication failed');
+    }
+    return Transaction.fromJson(jsonDecode(response.body));
+
+    //return _toTransaction(response);
   }
 
   Map<String, dynamic> _toMap(Transaction transaction) {

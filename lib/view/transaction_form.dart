@@ -1,3 +1,4 @@
+import 'package:bytebank/components/response_dialog.dart';
 import 'package:bytebank/components/transaction_auth_dialog.dart';
 import 'package:bytebank/http/webclient.dart';
 import 'package:bytebank/http/webclient/transaction_webclient.dart';
@@ -68,16 +69,12 @@ class _TransactionFormState extends State<TransactionForm> {
                       showDialog(
                           context: context,
                           builder: (context) {
-                            return TransactionAuthDialog();
+                            return TransactionAuthDialog(
+                              onConfirm: (String password) {
+                                _save(transactionCreated, password, context);
+                              },
+                            );
                           });
-                      // webclient
-                      //     .save(hostApi + ':8080/transactions',
-                      //         transactionCreated)
-                      //     .then((transaction) {
-                      //   if (transaction != null) {
-                      //     Navigator.pop(context);
-                      //   }
-                      //                    });
                     },
                   ),
                 ),
@@ -87,5 +84,27 @@ class _TransactionFormState extends State<TransactionForm> {
         ),
       ),
     );
+  }
+
+  void _save(Transaction transactionCreated, String senha,
+      BuildContext context) async {
+    webclient
+        .save(hostApi + ':8080/transactions', transactionCreated, senha)
+        .then((transaction) {
+      if (transaction != null) {
+        showDialog(
+            context: context,
+            builder: (contextDialog) {
+              return SuccessDialog('successful transaction');
+            }).then((value) => Navigator.pop(context));
+        Navigator.pop(context);
+      }
+    }).catchError((e) {
+      showDialog(
+          context: context,
+          builder: (contextDialog) {
+            return FailureDialog(e);
+          });
+    });
   }
 }
